@@ -7,6 +7,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +23,41 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends TimedRobot {
+  double speedMod;
+  double Speed;
+
+  private final DifferentialDrive m_robotDrive
+      = new DifferentialDrive(new Spark(0), new Spark(1));
+  private final XboxController m_Xbox = new XboxController(0);
+  private final Timer m_timer = new Timer();
+
+  public double GetSpeed(XboxController S_Xbox){
+    boolean aButton = S_Xbox.getAButton();
+    boolean bButton = S_Xbox.getBButton();
+    boolean yButton = S_Xbox.getYButton();
+    boolean xButton = S_Xbox.getXButton();
+
+    //Controls speed
+    if(aButton) {
+      Speed = 0.5;
+      System.out.println("A is pushed");
+    }
+    if(bButton) {
+      Speed = 0.75;
+      System.out.println("B is pushed");
+    } 
+    if(yButton) {
+      Speed = 1.0;
+      System.out.println("Y is pushed");
+    }
+    if(xButton){
+      Speed = 0.0;
+      System.out.println("X is pushed");
+    }
+
+    return Speed;
+  }
+  
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
@@ -86,6 +125,21 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    double rTrigger = m_Xbox.getRawAxis(3);
+    double lTrigger = m_Xbox.getRawAxis(2);
+    double lAnalog = m_Xbox.getRawAxis(0);
+
+    //Controls speed
+    speedMod = GetSpeed(m_Xbox);
+
+    //Drives Robot
+    if (rTrigger > 0){
+      m_robotDrive.arcadeDrive(rTrigger * speedMod * -1, lAnalog * speedMod);
+      System.out.println("Right trigger is pressed");
+    }else if (lTrigger > 0){
+      m_robotDrive.arcadeDrive(lTrigger * speedMod, lAnalog * speedMod);
+      System.out.println("Left trigger is pressed");
+    }
   }
 
   /**
