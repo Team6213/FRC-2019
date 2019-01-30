@@ -26,43 +26,16 @@ public class Robot extends TimedRobot {
   double speedMod;
   double Speed;
 
-  private final DifferentialDrive m_robotDrive
+  private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
-  private final Timer m_timer = new Timer();
+  private final Timer timer = new Timer();
 
-  public double GetSpeed(XboxController S_Xbox){
-    boolean aButton = S_Xbox.getAButton();
-    boolean bButton = S_Xbox.getBButton();
-    boolean yButton = S_Xbox.getYButton();
-    boolean xButton = S_Xbox.getXButton();
-
-    //Controls speed
-    if(aButton) {
-      Speed = 0.5;
-      System.out.println("A is pushed");
-    }
-    if(bButton) {
-      Speed = 0.75;
-      System.out.println("B is pushed");
-    } 
-    if(yButton) {
-      Speed = 1.0;
-      System.out.println("Y is pushed");
-    }
-    if(xButton){
-      Speed = 0.0;
-      System.out.println("X is pushed");
-    }
-
-    return Speed;
-  }
-  
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
+  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -134,10 +107,10 @@ public class Robot extends TimedRobot {
 
     //Drives Robot
     if (rTrigger > 0){
-      m_robotDrive.arcadeDrive(rTrigger * speedMod * -1, lAnalog * speedMod);
+      robotDrive.arcadeDrive(rTrigger * speedMod * -1, lAnalog * speedMod);
       System.out.println("Right trigger is pressed");
     }else if (lTrigger > 0){
-      m_robotDrive.arcadeDrive(lTrigger * speedMod, lAnalog * speedMod);
+      robotDrive.arcadeDrive(lTrigger * speedMod, lAnalog * speedMod);
       System.out.println("Left trigger is pressed");
     }
   }
@@ -148,4 +121,32 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
+
+  public double GetSpeed(XboxController S_Xbox){
+    boolean aButton = S_Xbox.getAButton();
+    boolean bButton = S_Xbox.getBButton();
+    boolean yButton = S_Xbox.getYButton();
+    boolean xButton = S_Xbox.getXButton();
+
+    //Controls speed
+    if(aButton) {
+      Speed = 0.5;
+      System.out.println("A is pushed");
+    }
+    if(bButton) {
+      Speed = 0.75;
+      System.out.println("B is pushed");
+    } 
+    if(yButton) {
+      Speed = 1.0;
+      System.out.println("Y is pushed");
+    }
+    if(xButton){
+      Speed = 0.0;
+      System.out.println("X is pushed");
+    }
+
+    return Speed;
+  }
+
 }
