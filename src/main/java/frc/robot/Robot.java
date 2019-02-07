@@ -12,8 +12,13 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -98,19 +103,19 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double rTrigger = m_Xbox.getRawAxis(3);
-    double lTrigger = m_Xbox.getRawAxis(2);
+    // double rTrigger = m_Xbox.getRawAxis(3);
+    // double lTrigger = m_Xbox.getRawAxis(2);
     double lAnalog = m_Xbox.getRawAxis(0);
 
     //Controls speed
     speedMod = GetSpeed(m_Xbox);
 
     //Drives Robot
-    if (rTrigger > 0){
-      robotDrive.arcadeDrive(rTrigger * speedMod * -1, lAnalog * speedMod);
+    if (m_Xbox.getRawAxis(3) > 0){
+      robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod * -1, lAnalog * speedMod);
       System.out.println("Right trigger is pressed");
-    }else if (lTrigger > 0){
-      robotDrive.arcadeDrive(lTrigger * speedMod, lAnalog * speedMod);
+    }else if (m_Xbox.getRawAxis(3) > 0){
+      robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod, lAnalog * speedMod);
       System.out.println("Left trigger is pressed");
     }
   }
@@ -122,6 +127,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
+  ///////////////////Custom Methods///////////////////////////
   public double GetSpeed(XboxController S_Xbox){
     boolean aButton = S_Xbox.getAButton();
     boolean bButton = S_Xbox.getBButton();
@@ -148,5 +154,5 @@ public class Robot extends TimedRobot {
 
     return Speed;
   }
-
+  
 }
