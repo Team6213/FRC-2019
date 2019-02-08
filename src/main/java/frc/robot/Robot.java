@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
   private final Timer timer = new Timer();
+  private Pneumatics ChomCheck = new Pneumatics();
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
@@ -101,6 +102,11 @@ public class Robot extends TimedRobot {
   /**
    * This function is called periodically during operator control.
    */
+  @Override
+  public void teleopInit(){
+    ChomCheck.GoTest();
+  }
+
   @Override
   public void teleopPeriodic() {
     // double rTrigger = m_Xbox.getRawAxis(3);
