@@ -102,10 +102,7 @@ public class Robot extends TimedRobot {
   /**
    * This function is called periodically during operator control.
    */
-  @Override
-  public void teleopInit(){
-    ChomCheck.GoTest();
-  }
+
 
   @Override
   public void teleopPeriodic() {
