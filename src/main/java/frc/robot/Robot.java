@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -51,6 +52,8 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**
@@ -104,7 +107,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopInit(){
-    ChomCheck.GoTest();
+    //ChomCheck.GoTest();
+    ChomCheck.cOn();
   }
 
   @Override
@@ -113,6 +117,17 @@ public class Robot extends TimedRobot {
     // double lTrigger = m_Xbox.getRawAxis(2);
     double lAnalog = m_Xbox.getRawAxis(0);
 
+    ChomCheck.cOn();
+    if (m_Xbox.getBumper(Hand.kLeft) == true){
+      ChomCheck.pushUp();
+    }else{
+      ChomCheck.stayStill();
+    }
+
+    if (m_Xbox.getBumper(Hand.kRight) == true){
+      ChomCheck.goBack();
+    }
+    
     //Controls speed
     speedMod = GetSpeed(m_Xbox);
 
@@ -120,8 +135,8 @@ public class Robot extends TimedRobot {
     if (m_Xbox.getRawAxis(3) > 0){
       robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod * -1, lAnalog * speedMod);
       System.out.println("Right trigger is pressed");
-    }else if (m_Xbox.getRawAxis(3) > 0){
-      robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod, lAnalog * speedMod);
+    }else if (m_Xbox.getRawAxis(2) > 0){
+      robotDrive.arcadeDrive(m_Xbox.getRawAxis(2) * speedMod, lAnalog * speedMod);
       System.out.println("Left trigger is pressed");
     }
   }
