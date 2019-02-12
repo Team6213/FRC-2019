@@ -18,25 +18,68 @@
 /*                                                                                    ©  */
 /*---------------------------------------------------------------------------------------*/
 
-package frc.robot;
+package frc.pneumatics;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.hal.JNIWrapper;
+import edu.wpi.first.hal.CompressorJNI;
+import edu.wpi.first.wpilibj.SolenoidBase;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 
-/**
- * Do NOT add any static variables to this class, or any initialization at all.
- * Unless you know what you are doing, do not modify this file except to
- * change the parameter class to the startRobot call.
- */
-public final class Main {
-  private Main() {
-  }
+//Code for Pneumatics///
+public class Pneumatics {
+    Compressor c = new Compressor(0);
+    boolean enabled = c.enabled();
+    boolean pressureSwitch = c.getPressureSwitchValue();
+    double current = c.getCompressorCurrent();
+    Solenoid SS1 = new Solenoid(1);
+    DoubleSolenoid SD1 = new DoubleSolenoid(6, 7);
 
-  /**
-   * Main initialization function. Do not perform any initialization here.
-   *
-   * <p>If you change your main robot class, change the parameter type.
-   */
-  public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
-  }
+    //Compressor Code///
+    public void CheckC(){
+        System.out.println("Enabled: " + enabled);
+        System.out.println("Pressure Switch: " + pressureSwitch);
+        System.out.println("Current: " + current + "\n");
+    }
+    
+    public void GoTest(){
+        c.setClosedLoopControl(true);
+        CheckC();
+        c.setClosedLoopControl(false);
+        CheckC();
+    }
+
+    public void cOn(){
+        c.setClosedLoopControl(true);
+    }
+
+    public void cOff(){
+        c.setClosedLoopControl(false);
+    }
+
+    //Solenoid Code//
+    public void testSS1(){
+        SS1.set(true);
+        SS1.set(false);
+    }
+
+    public void testSD1(){
+        SD1.set(DoubleSolenoid.Value.kForward);
+        SD1.set(DoubleSolenoid.Value.kOff);
+        SD1.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public void pushUp(){
+        SD1.set(DoubleSolenoid.Value.kForward);
+    }
+
+    public void stayStill(){
+        SD1.set(DoubleSolenoid.Value.kOff);
+    }
+
+    public void goBack(){
+        SD1.set(DoubleSolenoid.Value.kReverse);
+    }
 }

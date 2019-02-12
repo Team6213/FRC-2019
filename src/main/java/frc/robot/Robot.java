@@ -1,22 +1,39 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------*/                                                                            
+/*            66666666       222222222222222         1111111       333333333333333       */
+/*           6::::::6       2:::::::::::::::22      1::::::1      3:::::::::::::::33     */
+/*          6::::::6        2::::::222222:::::2    1:::::::1      3::::::33333::::::3    */
+/*         6::::::6         2222222     2:::::2    111:::::1      3333333     3:::::3    */
+/*        6::::::6                      2:::::2       1::::1                  3:::::3    */
+/*       6::::::6                       2:::::2       1::::1                  3:::::3    */
+/*      6::::::6                     2222::::2        1::::1          33333333:::::3     */
+/*     6::::::::66666           22222::::::22         1::::l          3:::::::::::3      */
+/*    6::::::::::::::66       22::::::::222           1::::l          33333333:::::3     */
+/*    6::::::66666:::::6     2:::::22222              1::::l                  3:::::3    */
+/*    6:::::6     6:::::6   2:::::2                   1::::l                  3:::::3    */
+/*    6:::::6     6:::::6   2:::::2                   1::::l                  3:::::3    */
+/*    6::::::66666::::::6   2:::::2       222222   111::::::111   3333333     3:::::3    */
+/*     66:::::::::::::66    2::::::2222222:::::2   1::::::::::1   3::::::33333::::::3    */
+/*       66:::::::::66      2::::::::::::::::::2   1::::::::::1   3:::::::::::::::33     */
+/*         666666666        22222222222222222222   111111111111    333333333333333       */
+/*                                                                                    ©  */
+/*---------------------------------------------------------------------------------------*/
 
 package frc.robot;
 
+////////////////////////Custom imports////////////////////////////////
+import frc.pneumatics.Pneumatics;
+import frc.autonomous.Auto;
+import frc.vision.*;
+
+/////////////////////////WPILib imports///////////////////////////////
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 
@@ -51,6 +68,8 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**
@@ -65,17 +84,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select
-   * between different autonomous modes using the dashboard. The sendable
-   * chooser code works with the Java SmartDashboard. If you prefer the
-   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-   * getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to
-   * the switch structure below with additional strings. If using the
-   * SendableChooser make sure to add them to the chooser code above as well.
-   */
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
@@ -105,11 +113,28 @@ public class Robot extends TimedRobot {
 
 
   @Override
+  public void teleopInit(){
+    //ChomCheck.GoTest();
+    ChomCheck.cOn();
+  }
+
+  @Override
   public void teleopPeriodic() {
     // double rTrigger = m_Xbox.getRawAxis(3);
     // double lTrigger = m_Xbox.getRawAxis(2);
     double lAnalog = m_Xbox.getRawAxis(0);
 
+    ChomCheck.cOn();
+    if (m_Xbox.getBumper(Hand.kLeft)){
+      ChomCheck.pushUp();
+    }else{
+      ChomCheck.stayStill();
+    }
+
+    if (m_Xbox.getBumper(Hand.kRight)){
+      ChomCheck.goBack();
+    }
+    
     //Controls speed
     speedMod = GetSpeed(m_Xbox);
 
@@ -117,8 +142,8 @@ public class Robot extends TimedRobot {
     if (m_Xbox.getRawAxis(3) > 0){
       robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod * -1, lAnalog * speedMod);
       System.out.println("Right trigger is pressed");
-    }else if (m_Xbox.getRawAxis(3) > 0){
-      robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod, lAnalog * speedMod);
+    }else if (m_Xbox.getRawAxis(2) > 0){
+      robotDrive.arcadeDrive(m_Xbox.getRawAxis(2) * speedMod, lAnalog * speedMod);
       System.out.println("Left trigger is pressed");
     }
   }
