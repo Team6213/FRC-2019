@@ -113,8 +113,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // double rTrigger = m_Xbox.getRawAxis(3);
-    // double lTrigger = m_Xbox.getRawAxis(2);
+    double rTrigger = m_Xbox.getRawAxis(3);
+    double lTrigger = m_Xbox.getRawAxis(2);
     double lAnalog = m_Xbox.getRawAxis(0);
 
     ChomCheck.cOn();
@@ -133,11 +133,13 @@ public class Robot extends TimedRobot {
 
     //Drives Robot
     if (m_Xbox.getRawAxis(3) > 0){
-      robotDrive.arcadeDrive(m_Xbox.getRawAxis(3) * speedMod * -1, lAnalog * speedMod);
+      robotDrive.arcadeDrive(rTrigger * speedMod, lAnalog);
       System.out.println("Right trigger is pressed");
     }else if (m_Xbox.getRawAxis(2) > 0){
-      robotDrive.arcadeDrive(m_Xbox.getRawAxis(2) * speedMod, lAnalog * speedMod);
+      robotDrive.arcadeDrive(lTrigger * (speedMod * -1), lAnalog);
       System.out.println("Left trigger is pressed");
+    }else{
+      robotDrive.arcadeDrive(0, lAnalog * speedMod);
     }
   }
 
@@ -164,14 +166,14 @@ public class Robot extends TimedRobot {
       Speed = 0.75;
       System.out.println("B is pushed");
     } 
-    if(yButton) {
+    /*if(yButton) {
       Speed = 1.0;
       System.out.println("Y is pushed");
     }
-    if(xButton){
+    /*if(xButton){
       Speed = 0.0;
       System.out.println("X is pushed");
-    }
+    }*/
 
     return Speed;
   }
