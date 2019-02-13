@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -45,15 +46,32 @@ import edu.wpi.first.wpilibj.CameraServer;
  * project.
  */
 public class Robot extends TimedRobot {
+  
+  //Lightning McQueen///
   double speedMod;
   double Speed;
+  //////////////////////
+
+  //PS74 Controller//
+  private final XboxController m_Xbox = new XboxController(0);
+  double rTrigger;
+  double lTrigger;
+  boolean rBumper;
+  boolean lBumper;
+  double lAnalog;
+  double rAnalog;
+  ///////////////////
+
+  //Avatar: The Last Airpods//
+  private Pneumatics ChomCheck = new Pneumatics();
+  //////////
+
+  //Bomb//
+  private final Timer timer = new Timer();
+  ////////
 
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
-  private final XboxController m_Xbox = new XboxController(0);
-  private final Timer timer = new Timer();
-  private Pneumatics ChomCheck = new Pneumatics();
-
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
@@ -114,24 +132,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit(){
-    //ChomCheck.GoTest();
-    ChomCheck.cOn();
+    rTrigger = m_Xbox.getRawAxis(3);
+    lTrigger = m_Xbox.getRawAxis(2);
+    rBumper = m_Xbox.getBumper(Hand.kRight);
+    lBumper = m_Xbox.getBumper(Hand.kLeft);
+    lAnalog = m_Xbox.getRawAxis(0);
+    //rAnalog = m_Xbox.getRawAxis();
   }
 
   @Override
   public void teleopPeriodic() {
-    double rTrigger = m_Xbox.getRawAxis(3);
-    double lTrigger = m_Xbox.getRawAxis(2);
-    double lAnalog = m_Xbox.getRawAxis(0);
-    //double rAnalog = m_Xbox.getRawAxis();
-
-    ChomCheck.cOn();
-    if (m_Xbox.getBumper(Hand.kLeft)){
+    if (lBumper){
       ChomCheck.pushUp();
     }else{
       ChomCheck.stayStill();
     }
-
     if (m_Xbox.getBumper(Hand.kRight)){
       ChomCheck.goBack();
     }
@@ -149,6 +164,7 @@ public class Robot extends TimedRobot {
     }else{
       robotDrive.arcadeDrive(0, lAnalog);
     }
+
   }
 
   /**
