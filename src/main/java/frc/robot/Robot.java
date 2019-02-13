@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -52,12 +53,13 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
   private final Timer timer = new Timer();
-  private Pneumatics ChomCheck = new Pneumatics();
-
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final DigitalInput topElevatorSwitch = new DigitalInput(1);
+
+  private Pneumatics ChomCheck = new Pneumatics();
   
   /**
    * This function is run when the robot is first started up and should be
@@ -145,6 +147,12 @@ public class Robot extends TimedRobot {
     }else if (m_Xbox.getRawAxis(2) > 0){
       robotDrive.arcadeDrive(m_Xbox.getRawAxis(2) * speedMod, lAnalog * speedMod);
       System.out.println("Left trigger is pressed");
+    }
+
+    //Limit Switcher Test
+    if(topElevatorSwitch.get()){
+      System.out.println("Switch is pressed");
+      ChomCheck.pushUp();
     }
   }
 
