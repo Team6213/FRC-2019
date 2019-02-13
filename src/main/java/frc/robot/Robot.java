@@ -46,9 +46,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * project.
  */
 public class Robot extends TimedRobot {
-  double speedMod;
-  double Speed;
-
+  //Robot Objects
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
@@ -59,8 +57,13 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final DigitalInput topElevatorSwitch = new DigitalInput(1);
 
+  //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
   
+  //Variables
+  double speedMod;
+  double Speed;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
