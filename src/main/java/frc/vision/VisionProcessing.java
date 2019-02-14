@@ -32,8 +32,11 @@ public class VisionProcessing {
     int IMG_HEIGHT;
     int IMG_WIDTH;
     UsbCamera cam;
+    double centerX = 0.0;
     VisionPipeline pipe;
     VisionThread visionThread;
+    final Object imgLock = new Object();
+
 
     public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT, VisionPipeline pipe){
         this.IMG_HEIGHT = IMG_HEIGHT;
@@ -49,6 +52,13 @@ public class VisionProcessing {
 
     public void visionInit(){
         startCapture();
-        visionThread = new VisionThread(cam, pipeline, listener)
+        visionThread = new VisionThread(cam, pipe, pipeline ->{
+            if (!pipe.findBlobsOutput().isEmpty()){
+                Rect r = Imgproc.boundingRect(pipe.findsBlobsOutput().blobDect(0));
+                synchronized (imgLock) {
+                    centerX = r.x + (r.width / 2);
+                }
+            }
+        });
     }
 }
