@@ -22,6 +22,8 @@ package frc.vision;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.vision.VisionPipeline;
+import edu.wpi.first.wpilibj.vision.VisionThread;
 
 /**
  * Add your docs here.
@@ -30,17 +32,16 @@ public class VisionProcessing {
     int IMG_HEIGHT;
     int IMG_WIDTH;
     UsbCamera cam;
-    FRCBallTracking = new BallVisionTracking();
-    if FRCBallTracking.findBlobsOutput(
-        synchronized (imgLock) {
-            centerX = r.x + (r.width / 2);
-        }
-        robotDrive.arcadeDrive(1.0, 0.0);
-    )
+    double centerX = 0.0;
+    VisionPipeline pipe;
+    VisionThread visionThread;
+    final Object imgLock = new Object();
 
-    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT){
-        IMG_HEIGHT = this.IMG_HEIGHT;
-        IMG_WIDTH = this.IMG_WIDTH;
+
+    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT, VisionPipeline pipe){
+        this.IMG_HEIGHT = IMG_HEIGHT;
+        this.IMG_WIDTH = IMG_WIDTH;
+        this.pipe = pipe;
 
     }
 
@@ -50,6 +51,14 @@ public class VisionProcessing {
     }
 
     public void visionInit(){
-
+        startCapture();
+        visionThread = new VisionThread(cam, pipe, pipeline ->{
+            if (!pipe.findBlobsOutput().isEmpty()){
+                Rect r = Imgproc.boundingRect(pipe.findsBlobsOutput().blobDect(0));
+                synchronized (imgLock) {
+                    centerX = r.x + (r.width / 2);
+                }
+            }
+        });
     }
 }
