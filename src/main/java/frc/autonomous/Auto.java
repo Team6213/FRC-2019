@@ -18,25 +18,33 @@
 /*                                                                                    ©  */
 /*---------------------------------------------------------------------------------------*/
 
-package frc.robot;
-
-import edu.wpi.first.wpilibj.RobotBase;
+package frc.autonomous;
 
 /**
- * Do NOT add any static variables to this class, or any initialization at all.
- * Unless you know what you are doing, do not modify this file except to
- * change the parameter class to the startRobot call.
+ * Autonomous code that will be referenced in the Robot.java file
  */
-public final class Main {
-  private Main() {
-  }
 
-  /**
-   * Main initialization function. Do not perform any initialization here.
-   *
-   * <p>If you change your main robot class, change the parameter type.
-   */
-  public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
-  }
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
+public class Auto {
+    final double SpeedRate = 2.0;
+
+    public void LeftSideAuto(DifferentialDrive robotDrive, Timer timer) {
+        
+    }
+
+    public void defaultAuto(DifferentialDrive robotDrive, Timer timer) {
+        if (timer.get() < CalcTime(10.25)) {
+            robotDrive.arcadeDrive(1.0, 0.0);
+        }else if(timer.get() > CalcTime(10.25) && timer.get() <  CalcTime(15.25)) {
+            robotDrive.arcadeDrive(0.0, 0.5);
+            
+        }
+    }
+    public double CalcTime(double distance) {
+        double time = distance / SpeedRate;
+        return time; 
+
+    }
 }

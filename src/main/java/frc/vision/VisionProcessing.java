@@ -18,25 +18,31 @@
 /*                                                                                    ©  */
 /*---------------------------------------------------------------------------------------*/
 
-package frc.robot;
+package frc.vision;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 
 /**
- * Do NOT add any static variables to this class, or any initialization at all.
- * Unless you know what you are doing, do not modify this file except to
- * change the parameter class to the startRobot call.
+ * Add your docs here.
  */
-public final class Main {
-  private Main() {
-  }
+public class VisionProcessing {
+    int IMG_HEIGHT;
+    int IMG_WIDTH;
+    UsbCamera cam;
 
-  /**
-   * Main initialization function. Do not perform any initialization here.
-   *
-   * <p>If you change your main robot class, change the parameter type.
-   */
-  public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
-  }
+    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT){
+        IMG_HEIGHT = this.IMG_HEIGHT;
+        IMG_WIDTH = this.IMG_WIDTH;
+
+    }
+
+    public void startCapture(){
+        cam = CameraServer.getInstance().startAutomaticCapture();
+        cam.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    }
+
+    public void visionInit(){
+
+    }
 }
