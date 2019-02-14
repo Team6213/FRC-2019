@@ -48,21 +48,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * project.
  */
 public class Robot extends TimedRobot {
-<<<<<<< HEAD
-  
-  //Lightning McQueen///
-  double speedMod;
-  double Speed;
-  final double eSpeed = 0.5;
-  //////////////////////
-
-  //PS74 Controller//
-=======
   //Robot Objects
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
->>>>>>> 4bea2967470faf004d8b04d59c9840f42ee20f94
   private final XboxController m_Xbox = new XboxController(0);
+  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -70,31 +60,22 @@ public class Robot extends TimedRobot {
   double lAnalog;
   double rAnalog;
   double eControl;
-  ///////////////////
-
-  //Avatar: The Last Airpods//
-  private Pneumatics ChomCheck = new Pneumatics();
-  ////////////////////////////
-
-  private final Timer timer = new Timer();
-  private final DifferentialDrive robotDrive = new DifferentialDrive(new Spark(0), new Spark(1));
-
-  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
   boolean bSPressed;
   boolean tSPressed;
+  final double eSpeed = 0.5;
+  ///////////////////  
+
+  private final Timer timer = new Timer();
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final DigitalInput topElevatorSwitch = new DigitalInput(1);
-<<<<<<< HEAD
   private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
-=======
 
   //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
->>>>>>> 4bea2967470faf004d8b04d59c9840f42ee20f94
   
   //Variables
   double speedMod;
