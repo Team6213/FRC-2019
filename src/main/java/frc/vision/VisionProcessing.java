@@ -30,6 +30,13 @@ public class VisionProcessing {
     int IMG_HEIGHT;
     int IMG_WIDTH;
     UsbCamera cam;
+    FRCBallTracking = new BallVisionTracking();
+    if FRCBallTracking.findBlobsOutput(
+        synchronized (imgLock) {
+            centerX = r.x + (r.width / 2);
+        }
+        robotDrive.arcadeDrive(1.0, 0.0);
+    )
 
     public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT){
         IMG_HEIGHT = this.IMG_HEIGHT;
