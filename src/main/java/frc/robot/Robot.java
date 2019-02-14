@@ -27,6 +27,8 @@ import frc.vision.*;
 
 /////////////////////////WPILib imports///////////////////////////////
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
@@ -50,6 +52,7 @@ public class Robot extends TimedRobot {
   //Lightning McQueen///
   double speedMod;
   double Speed;
+  final double eSpeed = 0.5;
   //////////////////////
 
   //PS74 Controller//
@@ -60,22 +63,26 @@ public class Robot extends TimedRobot {
   boolean lBumper;
   double lAnalog;
   double rAnalog;
+  double eControl;
   ///////////////////
 
   //Avatar: The Last Airpods//
   private Pneumatics ChomCheck = new Pneumatics();
-  //////////
+  ////////////////////////////
 
-  //Bomb//
   private final Timer timer = new Timer();
-  ////////
+  private final DifferentialDrive robotDrive = new DifferentialDrive(new Spark(0), new Spark(1));
 
-  private final DifferentialDrive robotDrive
-      = new DifferentialDrive(new Spark(0), new Spark(1));
+  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
+  boolean bSPressed;
+  boolean tSPressed;
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final DigitalInput topElevatorSwitch = new DigitalInput(1);
+  private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
   
   /**
    * This function is run when the robot is first started up and should be
@@ -137,7 +144,8 @@ public class Robot extends TimedRobot {
     rBumper = m_Xbox.getBumper(Hand.kRight);
     lBumper = m_Xbox.getBumper(Hand.kLeft);
     lAnalog = m_Xbox.getRawAxis(0);
-    //rAnalog = m_Xbox.getRawAxis();
+    rAnalog = m_Xbox.getRawAxis(1);
+    eControl = m_Xbox.getY();
   }
 
   @Override
@@ -147,7 +155,7 @@ public class Robot extends TimedRobot {
     }else{
       ChomCheck.stayStill();
     }
-    if (rBumper)){
+    if (rBumper){
       ChomCheck.goBack();
     }
     
@@ -164,6 +172,36 @@ public class Robot extends TimedRobot {
     }else{
       robotDrive.arcadeDrive(0, lAnalog);
     }
+
+    tSPressed = topElevatorSwitch.get();
+    bSPressed = bottomElevatorSwitch.get();
+
+    //Limit Switcher Test
+    if(tSPressed){
+      System.out.println("Top Switch is pressed");
+      ChomCheck.pushUp();
+    }
+    if (bSPressed){
+      System.out.println("Bottom Switch is pressed");
+      ChomCheck.goBack();
+    }
+
+    //Elevator
+    if (tSPressed){
+      elevator.set(0);
+      if (eControl < 0){
+        elevator.set(eControl * eSpeed);
+      }
+    }else if (bSPressed){
+      elevator.set(0);
+      if (eControl > 0){
+        elevator.set(eControl * eSpeed);
+      }
+
+    }else{
+      elevator.set(eControl * eSpeed);
+    }
+    
 
   }
 
