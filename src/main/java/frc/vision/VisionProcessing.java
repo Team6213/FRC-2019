@@ -20,6 +20,9 @@
 
 package frc.vision;
 
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.vision.VisionPipeline;
@@ -33,12 +36,12 @@ public class VisionProcessing {
     int IMG_WIDTH;
     UsbCamera cam;
     double centerX = 0.0;
-    VisionPipeline pipe;
+    String pipe;
     VisionThread visionThread;
     final Object imgLock = new Object();
 
 
-    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT, VisionPipeline pipe){
+    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT, String pipe){
         this.IMG_HEIGHT = IMG_HEIGHT;
         this.IMG_WIDTH = IMG_WIDTH;
         this.pipe = pipe;
@@ -52,13 +55,16 @@ public class VisionProcessing {
 
     public void visionInit(){
         startCapture();
-        visionThread = new VisionThread(cam, pipe, pipeline ->{
-            if (!pipe.findBlobsOutput().isEmpty()){
-                Rect r = Imgproc.boundingRect(pipe.findsBlobsOutput().blobDect(0));
-                synchronized (imgLock) {
-                    centerX = r.x + (r.width / 2);
+        if(pipe == "BallVisionTracking"){
+            visionThread = new VisionThread(cam, new BallVisionTracking(), pipeline ->{
+                if (pipeline.findBlobsOutput() != null){
+                    Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
+                    synchronized (imgLock) {
+                        centerX = r.x + (r.width / 2);
+                    }
                 }
-            }
-        });
+            });
+        }
+        
     }
 }
