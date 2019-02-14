@@ -27,6 +27,8 @@ import frc.vision.*;
 
 /////////////////////////WPILib imports///////////////////////////////
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.MotorSafety;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
@@ -50,12 +52,27 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
+  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
+  double rTrigger;
+  double lTrigger;
+  boolean rBumper;
+  boolean lBumper;
+  double lAnalog;
+  double rAnalog;
+  double eControl;
+  boolean bSPressed;
+  boolean tSPressed;
+  final double eSpeed = 0.5;
+  ///////////////////  
+
   private final Timer timer = new Timer();
+
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final DigitalInput topElevatorSwitch = new DigitalInput(1);
+  private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
 
   //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
@@ -119,25 +136,23 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit(){
-    //ChomCheck.GoTest();
-    ChomCheck.cOn();
+    rTrigger = m_Xbox.getRawAxis(3);
+    lTrigger = m_Xbox.getRawAxis(2);
+    rBumper = m_Xbox.getBumper(Hand.kRight);
+    lBumper = m_Xbox.getBumper(Hand.kLeft);
+    lAnalog = m_Xbox.getRawAxis(0);
+    rAnalog = m_Xbox.getRawAxis(1);
+    eControl = m_Xbox.getY();
   }
 
   @Override
   public void teleopPeriodic() {
-    double rTrigger = m_Xbox.getRawAxis(3);
-    double lTrigger = m_Xbox.getRawAxis(2);
-    double lAnalog = m_Xbox.getRawAxis(0);
-    //double rAnalog = m_Xbox.getRawAxis();
-
-    ChomCheck.cOn();
-    if (m_Xbox.getBumper(Hand.kLeft)){
+    if (lBumper){
       ChomCheck.pushUp();
     }else{
       ChomCheck.stayStill();
     }
-
-    if (m_Xbox.getBumper(Hand.kRight)){
+    if (rBumper){
       ChomCheck.goBack();
     }
     
@@ -155,11 +170,36 @@ public class Robot extends TimedRobot {
       robotDrive.arcadeDrive(0, lAnalog);
     }
 
+    tSPressed = topElevatorSwitch.get();
+    bSPressed = bottomElevatorSwitch.get();
+
     //Limit Switcher Test
-    if(topElevatorSwitch.get()){
-      System.out.println("Switch is pressed");
+    if(tSPressed){
+      System.out.println("Top Switch is pressed");
       ChomCheck.pushUp();
     }
+    if (bSPressed){
+      System.out.println("Bottom Switch is pressed");
+      ChomCheck.goBack();
+    }
+
+    //Elevator
+    if (tSPressed){
+      elevator.set(0);
+      if (eControl < 0){
+        elevator.set(eControl * eSpeed);
+      }
+    }else if (bSPressed){
+      elevator.set(0);
+      if (eControl > 0){
+        elevator.set(eControl * eSpeed);
+      }
+
+    }else{
+      elevator.set(eControl * eSpeed);
+    }
+    
+
   }
 
   /**
