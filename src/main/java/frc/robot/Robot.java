@@ -147,7 +147,7 @@ public class Robot extends TimedRobot {
     }else{
       ChomCheck.stayStill();
     }
-    if (m_Xbox.getBumper(Hand.kRight)){
+    if (rBumper)){
       ChomCheck.goBack();
     }
     
