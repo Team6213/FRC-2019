@@ -69,6 +69,9 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
   private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
+
+  private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5)); // 4 and 5 are also placholders
+
   private final Timer timer = new Timer();
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
@@ -159,14 +162,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    if (lBumper){
+    /*if (lBumper){
       ChomCheck.pushUp();
     }else{
       ChomCheck.stayStill();
     }
     if (rBumper){
       ChomCheck.goBack();
-    }
+    }*/
     
     //Controls speed
     speedMod = GetSpeed(m_Xbox);
@@ -186,23 +189,25 @@ public class Robot extends TimedRobot {
     bSPressed = bottomElevatorSwitch.get();
 
     //Limit Switcher Test
-    if(tSPressed){
+    /*if(tSPressed){
       System.out.println("Top Switch is pressed");
       ChomCheck.pushUp();
     }
     if (bSPressed){
       System.out.println("Bottom Switch is pressed");
       ChomCheck.goBack();
-    }
+    }*/
 
     //Elevator
     if (tSPressed){
       elevator.set(0);
+      System.out.println("Top Switch is pressed");
       if (eControl < 0){
         elevator.set(eControl * eSpeed);
       }
     }else if (bSPressed){
       elevator.set(0);
+      System.out.println("Bottom Switch is pressed");
       if (eControl > 0){
         elevator.set(eControl * eSpeed);
       }
@@ -210,7 +215,12 @@ public class Robot extends TimedRobot {
       elevator.set(eControl * eSpeed);
     }
     
-
+    //Hand
+    if (rBumper){
+      HandGrab.arcadeDrive(1.0, 0.0); //Brings ball in
+    }else if (lBumper){
+      HandGrab.arcadeDrive(-1.0, 0.0); //Sends ball out
+    }
   }
 
   @Override
@@ -226,9 +236,8 @@ public class Robot extends TimedRobot {
     synchronized(BallTracking.getImgLock()){
       centerX = BallTracking.getCenterX();
     }
-    System.out.println(centerX);
-    // double turn = centerX - (IMG_WIDTH / 2);
-    // robotDrive.arcadeDrive(0.0, turn * 0.25);
+    double turn = centerX - (IMG_WIDTH / 2);
+    robotDrive.arcadeDrive(0.0, turn * 0.25);
   }
 
   ///////////////////Custom Methods///////////////////////////
