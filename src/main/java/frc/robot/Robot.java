@@ -234,8 +234,10 @@ public class Robot extends TimedRobot {
     synchronized(BallTracking.getImgLock()){
       centerX = BallTracking.getCenterX();
     }
-    double turn = centerX - (IMG_WIDTH / 2);
-    robotDrive.arcadeDrive(0.0, turn * 0.25);
+    System.out.println(centerX);
+
+    // double turn = centerX - (IMG_WIDTH / 2);
+    // robotDrive.arcadeDrive(0.0, turn * 0.25);
   }
 
   ///////////////////Custom Methods///////////////////////////
