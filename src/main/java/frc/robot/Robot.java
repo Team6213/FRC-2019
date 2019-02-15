@@ -23,7 +23,7 @@ package frc.robot;
 ////////////////////////Custom imports////////////////////////////////
 import frc.pneumatics.Pneumatics;
 import frc.autonomous.Auto;
-import frc.vision.*;
+import frc.vision.VisionProcessing;
 
 /////////////////////////WPILib imports///////////////////////////////
 import edu.wpi.first.wpilibj.XboxController;
@@ -48,11 +48,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * project.
  */
 public class Robot extends TimedRobot {
-  //Robot Objects
-  private final DifferentialDrive robotDrive
-      = new DifferentialDrive(new Spark(0), new Spark(1));
-  private final XboxController m_Xbox = new XboxController(0);
-  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
+  //Variables
+  double speedMod;
+  double Speed;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -63,10 +61,15 @@ public class Robot extends TimedRobot {
   boolean bSPressed;
   boolean tSPressed;
   final double eSpeed = 0.5;
-  ///////////////////  
+  final int IMG_HEIGHT = 340;
+  final int IMG_WIDTH = 340;
 
+  //Robot Objects
+  private final DifferentialDrive robotDrive
+      = new DifferentialDrive(new Spark(0), new Spark(1));
+  private final XboxController m_Xbox = new XboxController(0);
+  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
   private final Timer timer = new Timer();
-
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
@@ -76,10 +79,9 @@ public class Robot extends TimedRobot {
 
   //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
+  private VisionProcessing BallTracking = new VisionProcessing(340, 340, "BallVisionTracking");
   
-  //Variables
-  double speedMod;
-  double Speed;
+
 
   /**
    * This function is run when the robot is first started up and should be
@@ -91,7 +93,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
+    BallTracking.visionInit();
   }
 
   /**
@@ -104,6 +106,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+  }
+
+  @Override
+  public void disabledInit(){
+
+  }
+
+  @Override
+  public void disabledPeriodic(){
+
   }
 
   @Override
@@ -194,7 +206,6 @@ public class Robot extends TimedRobot {
       if (eControl > 0){
         elevator.set(eControl * eSpeed);
       }
-
     }else{
       elevator.set(eControl * eSpeed);
     }
@@ -202,14 +213,25 @@ public class Robot extends TimedRobot {
 
   }
 
+  @Override
+  public void testInit(){
+  }
+
   /**
    * This function is called periodically during test mode.
    */
   @Override
   public void testPeriodic() {
+    double centerX;
+    synchronized(BallTracking.getImgLock()){
+      centerX = BallTracking.getCenterX();
+    }
+    double turn = centerX - (IMG_WIDTH / 2);
+    robotDrive.arcadeDrive(0.0, turn * 0.25);
   }
 
   ///////////////////Custom Methods///////////////////////////
+
   public double GetSpeed(XboxController S_Xbox){
     boolean aButton = S_Xbox.getAButton();
     boolean bButton = S_Xbox.getBButton();

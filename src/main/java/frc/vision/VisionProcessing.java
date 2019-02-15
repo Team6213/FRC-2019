@@ -41,7 +41,7 @@ public class VisionProcessing {
     final Object imgLock = new Object();
 
 
-    public void VisionProcces(int IMG_WIDTH, int IMG_HEIGHT, String pipe){
+	public VisionProcessing(int IMG_WIDTH, int IMG_HEIGHT, String pipe){
         this.IMG_HEIGHT = IMG_HEIGHT;
         this.IMG_WIDTH = IMG_WIDTH;
         this.pipe = pipe;
@@ -55,16 +55,33 @@ public class VisionProcessing {
 
     public void visionInit(){
         startCapture();
-        if(pipe == "BallVisionTracking"){
-            visionThread = new VisionThread(cam, new BallVisionTracking(), pipeline ->{
-                if (pipeline.findBlobsOutput() != null){
-                    Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
-                    synchronized (imgLock) {
-                        centerX = r.x + (r.width / 2);
+
+        switch(pipe){
+            case "BallVisionTracking":
+                visionThread = new VisionThread(cam, new BallVisionTracking(), pipeline ->{
+                    if (pipeline.findBlobsOutput() != null){
+                        Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
+                        synchronized (imgLock) {
+                            double centerX2 = centerX;
+							centerX = r.x + (r.width / 2);
+                        }
                     }
-                }
-            });
-        }
-        
+                });
+                visionThread.start();
+            break;
+            default:
+                System.out.println("ERROR: INVALID PIPELINE");
+                break;
+        }  
     }
+
+    //Getters
+    public double getCenterX(){
+        return centerX;
+    }
+
+    public Object getImgLock(){
+        return imgLock;
+    }
+
 }
