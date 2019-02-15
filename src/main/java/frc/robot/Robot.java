@@ -96,7 +96,6 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    BallTracking.visionInit();
   }
 
   /**
@@ -225,6 +224,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit(){
+    BallTracking.visionInit();
   }
 
   /**
