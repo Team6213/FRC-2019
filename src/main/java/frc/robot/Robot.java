@@ -68,9 +68,9 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
-  private final Spark elevator = new Spark(3); // Spark 3 is just a placeholder
+  private final Spark elevator = new Spark(3);
 
-  private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5)); // 4 and 5 are also placholders
+  private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5));
 
   private final Timer timer = new Timer();
   private static final String kDefaultAuto = "Default";
