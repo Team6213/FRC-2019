@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
 
   //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
-  private VisionProcessing BallTracking = new VisionProcessing(340, 340, "BallVisionTracking");
+  private VisionProcessing VisionTracking = new VisionProcessing(340, 340, "ReflTapeTracking");
   
 
 
@@ -93,7 +93,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    BallTracking.visionInit();
+    VisionTracking.visionInit();
   }
 
   /**
@@ -223,8 +223,8 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     double centerX;
-    synchronized(BallTracking.getImgLock()){
-      centerX = BallTracking.getCenterX();
+    synchronized(VisionTracking.getImgLock()){
+      centerX = VisionTracking.getCenterX();
     }
     double turn = centerX - (IMG_WIDTH / 2);
     robotDrive.arcadeDrive(0.0, turn * 0.25);

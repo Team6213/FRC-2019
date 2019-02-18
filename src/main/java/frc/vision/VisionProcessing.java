@@ -29,12 +29,15 @@ import edu.wpi.first.wpilibj.vision.VisionPipeline;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
 /**
- * Add your docs here.
+ * When tracking reflective tape, it is best to use bright blue leds.
+ * Please refrain from using anything else.
+ * 
  */
 public class VisionProcessing {
     int IMG_HEIGHT;
     int IMG_WIDTH;
-    UsbCamera cam;
+    UsbCamera cam1;
+    UsbCamera cam2;
     double centerX = 0.0;
     String pipe;
     VisionThread visionThread;
@@ -49,8 +52,8 @@ public class VisionProcessing {
     }
 
     public void startCapture(){
-        cam = CameraServer.getInstance().startAutomaticCapture();
-        cam.setResolution(IMG_WIDTH, IMG_HEIGHT);
+        cam1 = CameraServer.getInstance().startAutomaticCapture(0);
+        cam1.setResolution(IMG_WIDTH, IMG_HEIGHT);
     }
 
     public void visionInit(){
@@ -58,23 +61,52 @@ public class VisionProcessing {
 
         switch(pipe){
             case "BallVisionTracking":
-                visionThread = new VisionThread(cam, new BallVisionTracking(), pipeline ->{
-                    if (pipeline.findBlobsOutput() != null){
-                        Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
-                        synchronized (imgLock) {
-                            double centerX2 = centerX;
-							centerX = r.x + (r.width / 2);
-                        }
-                    }
-                });
-                visionThread.start();
-            break;
+                ballTracking();
+                break;
+            case "ReflTapeTracking":
+                tapeTracking();
+                break;
             default:
                 System.out.println("ERROR: INVALID PIPELINE");
                 break;
         }  
     }
+    
+    public void ballTracking(){
+        visionThread = new VisionThread(cam1, new BallVisionTracking(), pipeline ->{
+            System.out.println("Creating vision thread for " + pipe);
+                if (!pipeline.findBlobsOutput().empty()){
+                    Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
+                    synchronized (imgLock) {
+                        centerX = r.x + (r.width / 2);
+                    }
+                }else if(pipeline.findBlobsOutput().empty()){
+                    System.out.println("No targets for " + pipe + " found");
+                }else{
+                    System.out.println("ERROR: SOMETHINGS WRONG WITH " + pipe + "PIPELINE");
+                }
+            });
+            visionThread.start();
+            System.out.println("Thread for " + pipe + " started.");
+    }
 
+    public void tapeTracking(){
+        visionThread = new VisionThread(cam1, new ReflTapeTracking(), pipeline ->{
+            System.out.println("Creating vision thread for " + pipe);
+                if (!pipeline.filterContoursOutput().isEmpty()){
+                    Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+                    synchronized (imgLock) {
+                        centerX = r.x + (r.width / 2);
+                    }
+                }else if(pipeline.filterContoursOutput().isEmpty()){
+                    System.out.println("No targets for " + pipe + " found");
+                }else{
+                    System.out.println("ERROR: SOMETHINGS WRONG WITH " + pipe + "PIPELINE");
+                }
+            });
+            visionThread.start();
+            System.out.println("Thread for " + pipe + " started.");
+    }
     //Getters
     public double getCenterX(){
         return centerX;
@@ -83,5 +115,6 @@ public class VisionProcessing {
     public Object getImgLock(){
         return imgLock;
     }
+
 
 }
