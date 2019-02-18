@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
 
   //Custom Objects
   private Pneumatics ChomCheck = new Pneumatics();
-  private VisionProcessing BallTracking = new VisionProcessing(340, 340, "BallVisionTracking");
+  private VisionProcessing VisionTracking = new VisionProcessing(340, 340, "ReflTapeTracking");
   
 
 
@@ -224,7 +224,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit(){
-    BallTracking.visionInit();
+    VisionTracking.visionInit();
   }
 
   /**
@@ -233,8 +233,8 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     double centerX;
-    synchronized(BallTracking.getImgLock()){
-      centerX = BallTracking.getCenterX();
+    synchronized(VisionTracking.getImgLock()){
+      centerX = VisionTracking.getCenterX();
     }
     System.out.println(centerX);
 
