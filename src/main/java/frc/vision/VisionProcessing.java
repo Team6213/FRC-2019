@@ -25,6 +25,7 @@ import org.opencv.imgproc.Imgproc;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.vision.VisionPipeline;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
@@ -36,8 +37,9 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 public class VisionProcessing {
     int IMG_HEIGHT;
     int IMG_WIDTH;
-    UsbCamera cam1;
-    UsbCamera cam2;
+    // int port = 0;
+    UsbCamera cam;
+    UsbCamera driveCam;
     double centerX = 0.0;
     String pipe;
     VisionThread visionThread;
@@ -51,13 +53,13 @@ public class VisionProcessing {
 
     }
 
-    public void startCapture(){
-        cam1 = CameraServer.getInstance().startAutomaticCapture(0);
-        cam1.setResolution(IMG_WIDTH, IMG_HEIGHT);
+    public void startCapture(int port){
+        cam = CameraServer.getInstance().startAutomaticCapture(port);
+        cam.setResolution(IMG_WIDTH, IMG_HEIGHT);
     }
 
     public void visionInit(){
-        startCapture();
+        startCapture(0);
 
         switch(pipe){
             case "BallVisionTracking":
@@ -73,7 +75,7 @@ public class VisionProcessing {
     }
     
     public void ballTracking(){
-        visionThread = new VisionThread(cam1, new BallVisionTracking(), pipeline ->{
+        visionThread = new VisionThread(cam, new BallVisionTracking(), pipeline ->{
             System.out.println("Creating vision thread for " + pipe);
                 if (!pipeline.findBlobsOutput().empty()){
                     Rect r = Imgproc.boundingRect(pipeline.findBlobsOutput());
@@ -91,7 +93,7 @@ public class VisionProcessing {
     }
 
     public void tapeTracking(){
-        visionThread = new VisionThread(cam1, new ReflTapeTracking(), pipeline ->{
+        visionThread = new VisionThread(cam, new ReflTapeTracking(), pipeline ->{
             System.out.println("Creating vision thread for " + pipe);
                 if (!pipeline.filterContoursOutput().isEmpty()){
                     Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));

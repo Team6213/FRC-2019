@@ -60,6 +60,8 @@ public class Robot extends TimedRobot {
   double eControl;
   boolean bSPressed;
   boolean tSPressed;
+  boolean bStart;
+  boolean bBack;
   final double eSpeed = 0.5;
   final int IMG_HEIGHT = 340;
   final int IMG_WIDTH = 340;
@@ -70,7 +72,8 @@ public class Robot extends TimedRobot {
   private final XboxController m_Xbox = new XboxController(0);
   private final Spark elevator = new Spark(3);
 
-  private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5));
+  // private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5));
+  private final Spark leftHandMotor = new Spark(4);
 
   private final Timer timer = new Timer();
   private static final String kDefaultAuto = "Default";
@@ -95,6 +98,8 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    VisionTracking.startCapture(0);
 
   }
 
@@ -152,11 +157,15 @@ public class Robot extends TimedRobot {
   public void teleopInit(){
     rTrigger = m_Xbox.getRawAxis(3);
     lTrigger = m_Xbox.getRawAxis(2);
-    rBumper = m_Xbox.getBumper(Hand.kRight);
-    lBumper = m_Xbox.getBumper(Hand.kLeft);
+    // rBumper = m_Xbox.getBumper(Hand.kRight);
+    // lBumper = m_Xbox.getBumper(Hand.kLeft);
+    rBumper = m_Xbox.getRawButton(5);
+    lBumper = m_Xbox.getRawButton(4);
     lAnalog = m_Xbox.getRawAxis(0);
     rAnalog = m_Xbox.getRawAxis(1);
     eControl = m_Xbox.getY();
+    bBack = m_Xbox.getRawButton(6);
+    bStart = m_Xbox.getRawButton(7);
   }
 
   @Override
@@ -169,6 +178,7 @@ public class Robot extends TimedRobot {
     if (rBumper){
       ChomCheck.goBack();
     }*/
+
     
     //Controls speed
     speedMod = GetSpeed(m_Xbox);
@@ -200,7 +210,7 @@ public class Robot extends TimedRobot {
     //Elevator
     if (tSPressed){
       elevator.set(0);
-      System.out.println("Top Switch is pressed");
+      // System.out.println("Top Switch is pressed");
       if (eControl < 0){
         elevator.set(eControl * eSpeed);
       }
@@ -215,10 +225,17 @@ public class Robot extends TimedRobot {
     }
     
     //Hand
-    if (rBumper){
-      HandGrab.arcadeDrive(1.0, 0.0); //Brings ball in
-    }else if (lBumper){
-      HandGrab.arcadeDrive(-1.0, 0.0); //Sends ball out
+    // if (rBumper){
+    //   HandGrab.arcadeDrive(1.0, 0.0); //Brings ball in
+    //   System.out.println("Pulling ball");
+    // }else if (lBumper){
+    //   HandGrab.arcadeDrive(-1.0, 0.0); //Sends ball out
+    //   System.out.println("Pushing ball");
+    // }
+
+    if(rBumper){
+      leftHandMotor.set(1.0); //Brings ball in
+      System.out.println("Pulling ball");
     }
   }
 
