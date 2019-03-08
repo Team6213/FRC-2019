@@ -170,7 +170,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     YAnalog = m_Xbox.getRawAxis(0);
-    
+
     robotDrive.arcadeDrive(m_Xbox.getY(), m_Xbox.getX());
 
     if(lBumper){
@@ -191,7 +191,7 @@ public class Robot extends TimedRobot {
       elev.set(m_Xbox.getRawAxis(2)*eSpeed);
       System.out.println("Motor Set");
     }else if(m_Xbox.getRawAxis(3) != 0){
-      elev.set(m_Xbox.getRawAxis(3)*eSpeed);
+      elev.set(-1 * (m_Xbox.getRawAxis(3)*eSpeed));
     }
 
   }
