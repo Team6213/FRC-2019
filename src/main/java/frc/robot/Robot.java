@@ -173,17 +173,17 @@ public class Robot extends TimedRobot {
 
     robotDrive.arcadeDrive(m_Xbox.getY(), m_Xbox.getX());
 
-    if(lBumper){
+    if(m_Xbox.getBumper(Hand.kRight)){
       intake.arcadeDrive(1.0, 0.0);
       System.out.println("Intake: In");
-    }else if(rBumper){
+    }else if(m_Xbox.getBumper(Hand.kLeft)){
       intake.arcadeDrive(-1.0, 0.0);
       System.out.println("Intake: Out");
     }
 
-    if(YAnalog > 0.5){
+    if(m_Xbox.getRawAxis(0) > 0.5){
       hatchSol.set(DoubleSolenoid.Value.kForward);
-    }else if(YAnalog < 0.5){
+    }else if(m_Xbox.getRawAxis(0) < 0.5){
       hatchSol.set(DoubleSolenoid.Value.kReverse);
     }
 
