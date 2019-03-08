@@ -23,7 +23,6 @@ package frc.robot;
 ////////////////////////Custom imports////////////////////////////////
 import frc.pneumatics.Pneumatics;
 import frc.autonomous.Auto;
-import frc.vision.VisionProcessing;
 
 /////////////////////////WPILib imports///////////////////////////////
 import edu.wpi.first.wpilibj.XboxController;
@@ -32,13 +31,15 @@ import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -55,11 +56,13 @@ public class Robot extends TimedRobot {
   double lTrigger;
   boolean rBumper;
   boolean lBumper;
-  double lAnalog;
-  double rAnalog;
+  double YAnalog;
+  double XAnalog;
   double eControl;
   boolean bSPressed;
   boolean tSPressed;
+  boolean bStart;
+  boolean bBack;
   final double eSpeed = 0.5;
   final int IMG_HEIGHT = 340;
   final int IMG_WIDTH = 340;
@@ -68,9 +71,10 @@ public class Robot extends TimedRobot {
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
   private final XboxController m_Xbox = new XboxController(0);
-  private final Spark elevator = new Spark(3);
+  private final VictorSP elev = new VictorSP(3);
 
-  private final DifferentialDrive HandGrab = new DifferentialDrive(new Spark(4), new Spark(5));
+  private final DifferentialDrive intake = new DifferentialDrive(new Spark(4), new Spark(5));
+  private final DoubleSolenoid hatchSol = new DoubleSolenoid(6, 7);
 
   private final Timer timer = new Timer();
   private static final String kDefaultAuto = "Default";
@@ -81,8 +85,7 @@ public class Robot extends TimedRobot {
   private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
 
   //Custom Objects
-  private Pneumatics ChomCheck = new Pneumatics();
-  private VisionProcessing VisionTracking = new VisionProcessing(340, 340, "ReflTapeTracking");
+
   
 
 
@@ -96,6 +99,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
   }
 
   /**
@@ -151,80 +155,50 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit(){
     rTrigger = m_Xbox.getRawAxis(3);
-    lTrigger = m_Xbox.getRawAxis(2);
+    // lTrigger = m_Xbox.getRawAxis(2);
     rBumper = m_Xbox.getBumper(Hand.kRight);
     lBumper = m_Xbox.getBumper(Hand.kLeft);
-    lAnalog = m_Xbox.getRawAxis(0);
-    rAnalog = m_Xbox.getRawAxis(1);
-    eControl = m_Xbox.getY();
+    // rBumper = m_Xbox.getRawButton(5);
+    // lBumper = m_Xbox.getRawButton(4);
+    YAnalog = m_Xbox.getRawAxis(0);
+    XAnalog = m_Xbox.getRawAxis(1);
+    // eControl = m_Xbox.getY();
+    // bBack = m_Xbox.getRawButton(6);
+    // bStart = m_Xbox.getRawButton(7);
   }
 
   @Override
   public void teleopPeriodic() {
-    /*if (lBumper){
-      ChomCheck.pushUp();
-    }else{
-      ChomCheck.stayStill();
-    }
-    if (rBumper){
-      ChomCheck.goBack();
-    }*/
+    YAnalog = m_Xbox.getRawAxis(0);
     
-    //Controls speed
-    speedMod = GetSpeed(m_Xbox);
+    robotDrive.arcadeDrive(m_Xbox.getY(), m_Xbox.getX());
 
-    //Drives Robot
-    if (rTrigger > 0){
-      robotDrive.arcadeDrive(rTrigger * speedMod, lAnalog);
-      System.out.println("Right trigger is pressed");
-    }else if (lTrigger > 0){
-      robotDrive.arcadeDrive(lTrigger * speedMod * -1, lAnalog);
-      System.out.println("Left trigger is pressed");
-    }else{
-      robotDrive.arcadeDrive(0, lAnalog);
+    if(lBumper){
+      intake.arcadeDrive(1.0, 0.0);
+      System.out.println("Intake: In");
+    }else if(rBumper){
+      intake.arcadeDrive(-1.0, 0.0);
+      System.out.println("Intake: Out");
     }
 
-    tSPressed = topElevatorSwitch.get();
-    bSPressed = bottomElevatorSwitch.get();
+    if(YAnalog > 0.5){
+      hatchSol.set(DoubleSolenoid.Value.kForward);
+    }else if(YAnalog < 0.5){
+      hatchSol.set(DoubleSolenoid.Value.kReverse);
+    }
 
-    //Limit Switcher Test
-    /*if(tSPressed){
-      System.out.println("Top Switch is pressed");
-      ChomCheck.pushUp();
+    if(m_Xbox.getRawAxis(2) != 0){
+      elev.set(m_Xbox.getRawAxis(2)*eSpeed);
+      System.out.println("Motor Set");
+    }else if(m_Xbox.getRawAxis(3) != 0){
+      elev.set(m_Xbox.getRawAxis(3)*eSpeed);
     }
-    if (bSPressed){
-      System.out.println("Bottom Switch is pressed");
-      ChomCheck.goBack();
-    }*/
 
-    //Elevator
-    if (tSPressed){
-      elevator.set(0);
-      System.out.println("Top Switch is pressed");
-      if (eControl < 0){
-        elevator.set(eControl * eSpeed);
-      }
-    }else if (bSPressed){
-      elevator.set(0);
-      System.out.println("Bottom Switch is pressed");
-      if (eControl > 0){
-        elevator.set(eControl * eSpeed);
-      }
-    }else{
-      elevator.set(eControl * eSpeed);
-    }
-    
-    //Hand
-    if (rBumper){
-      HandGrab.arcadeDrive(1.0, 0.0); //Brings ball in
-    }else if (lBumper){
-      HandGrab.arcadeDrive(-1.0, 0.0); //Sends ball out
-    }
   }
 
   @Override
   public void testInit(){
-    VisionTracking.visionInit();
+  
   }
 
   /**
@@ -232,14 +206,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    double centerX;
-    synchronized(VisionTracking.getImgLock()){
-      centerX = VisionTracking.getCenterX();
-    }
-    System.out.println(centerX);
-
-    // double turn = centerX - (IMG_WIDTH / 2);
-    // robotDrive.arcadeDrive(0.0, turn * 0.25);
+    
   }
 
   ///////////////////Custom Methods///////////////////////////
