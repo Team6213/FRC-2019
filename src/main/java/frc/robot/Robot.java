@@ -51,7 +51,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class Robot extends TimedRobot {
   //Variables
   double speedMod;
-  double speed;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -63,7 +62,7 @@ public class Robot extends TimedRobot {
   boolean tSPressed;
   boolean bStart;
   boolean bBack;
-  final double eSpeed = 0.5;
+  final double eSpeed = 0.4;
   final int IMG_HEIGHT = 340;
   final int IMG_WIDTH = 340;
 
@@ -136,14 +135,44 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kSandstorm:
-        teleopInit();
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+    // switch (m_autoSelected) {
+    //   case kSandstorm:
+    //     teleopInit();
+    //     break;
+    //   case kDefaultAuto:
+    //   default:
+    //     // Put default auto code here
+    //     break;
+    // }
+
+    speedMod = getSpeedMod(m_Xbox);
+    YAnalog = m_Xbox.getRawAxis(0);
+
+    //Drive code
+    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod));
+
+    //Intake code
+    if(m_Xbox.getBumper(Hand.kRight)){
+      intake.arcadeDrive(0.5, 0.0); //Outtake
+    }else if(m_Xbox.getBumper(Hand.kLeft)){
+      intake.arcadeDrive(-0.5, 0.0); //Intake
+    }
+
+    if(m_Xbox.getRawAxis(1) != 0){
+      if(m_Xbox.getRawAxis(1) > 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kForward);
+      }else if(m_Xbox.getRawAxis(1) < 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kReverse);
+      }
+    }
+
+    //Elevator code
+    if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
+      elev.set(eSpeed);
+    }else if(m_Xbox.getRawAxis(3) != 0.0){//rTrigg
+      elev.set(-1 * (eSpeed));
+    }else{
+      elev.stopMotor();
     }
   }
 
@@ -169,34 +198,34 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    speedMod = getSpeed(m_Xbox);
+    speedMod = getSpeedMod(m_Xbox);
     YAnalog = m_Xbox.getRawAxis(0);
 
     //Drive code
-    robotDrive.arcadeDrive(m_Xbox.getY() * speedMod, m_Xbox.getX() * speedMod);
+    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod));
 
     //Intake code
     if(m_Xbox.getBumper(Hand.kRight)){
-      intake.arcadeDrive(0.75, 0.0); //Outtake
+      intake.arcadeDrive(0.5, 0.0); //Outtake
     }else if(m_Xbox.getBumper(Hand.kLeft)){
-      intake.arcadeDrive(-0.75, 0.0); //Intake
+      intake.arcadeDrive(-0.5, 0.0); //Intake
     }
 
-    if(m_Xbox.getRawAxis(0) > 0.5){
-      hatchSol.set(DoubleSolenoid.Value.kForward);
-    }else if(m_Xbox.getRawAxis(0) < 0.5){
-    hatchSol.set(DoubleSolenoid.Value.kReverse);
+    if(m_Xbox.getRawAxis(1) != 0){
+      if(m_Xbox.getRawAxis(1) > 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kForward);
+      }else if(m_Xbox.getRawAxis(1) < 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kReverse);
+      }
     }
 
     //Elevator code
-    if(m_Xbox.getRawAxis(2) != 0.25){ //lTrigg
+    if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
       elev.set(eSpeed);
-      if(topElevSwitch.get()){
-        elev.stopMotor();
-        System.out.println();
-      }
-    }else if(m_Xbox.getRawAxis(3) != 0.25){//rTrigg
+    }else if(m_Xbox.getRawAxis(3) != 0.0){//rTrigg
       elev.set(-1 * (eSpeed));
+    }else{
+      elev.stopMotor();
     }
 
   }
@@ -216,19 +245,21 @@ public class Robot extends TimedRobot {
 
   ///////////////////Custom Methods///////////////////////////
 
-  public double getSpeed(XboxController m_Xbox){
+  public double getSpeedMod(XboxController m_Xbox){
     boolean aButton = m_Xbox.getAButton();
     boolean bButton = m_Xbox.getBButton();
     boolean yButton = m_Xbox.getYButton();
     boolean xButton = m_Xbox.getXButton();
 
+    double speed = 1.0;
+
     //Controls speed
     if(aButton) {
-      speed = 0.5;
+      speed = 0.25;
       System.out.println("A is pushed");
     }
     if(bButton) {
-      speed = 0.75;
+      speed = 0.5;
       System.out.println("B is pushed");
     } 
     if(yButton) {
