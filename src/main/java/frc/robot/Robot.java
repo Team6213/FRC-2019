@@ -51,7 +51,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 public class Robot extends TimedRobot {
   //Variables
   double speedMod;
-  double Speed;
+  double speed;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -78,14 +78,14 @@ public class Robot extends TimedRobot {
 
   private final Timer timer = new Timer();
   private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String kSandstorm = "Sandstorm";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final DigitalInput topElevatorSwitch = new DigitalInput(1);
-  private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
+  private final DigitalInput topElevSwitch = new DigitalInput(1);
+  // private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
 
   //Custom Objects
-
+  private final Auto auto = new Auto();
   
 
 
@@ -95,8 +95,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    m_chooser.setDefaultOption("Default Auto", kSandstorm);
+    m_chooser.addOption("My Auto", kDefaultAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
     UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
@@ -137,8 +137,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
+      case kSandstorm:
+        teleopInit();
         break;
       case kDefaultAuto:
       default:
@@ -169,29 +169,34 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    speedMod = getSpeed(m_Xbox);
     YAnalog = m_Xbox.getRawAxis(0);
 
-    robotDrive.arcadeDrive(m_Xbox.getY(), m_Xbox.getX());
+    //Drive code
+    robotDrive.arcadeDrive(m_Xbox.getY() * speedMod, m_Xbox.getX() * speedMod);
 
+    //Intake code
     if(m_Xbox.getBumper(Hand.kRight)){
-      intake.arcadeDrive(1.0, 0.0);
-      System.out.println("Intake: In");
+      intake.arcadeDrive(0.75, 0.0); //Outtake
     }else if(m_Xbox.getBumper(Hand.kLeft)){
-      intake.arcadeDrive(-1.0, 0.0);
-      System.out.println("Intake: Out");
+      intake.arcadeDrive(-0.75, 0.0); //Intake
     }
 
     if(m_Xbox.getRawAxis(0) > 0.5){
       hatchSol.set(DoubleSolenoid.Value.kForward);
     }else if(m_Xbox.getRawAxis(0) < 0.5){
-      hatchSol.set(DoubleSolenoid.Value.kReverse);
+    hatchSol.set(DoubleSolenoid.Value.kReverse);
     }
 
-    if(m_Xbox.getRawAxis(2) != 0){
-      elev.set(m_Xbox.getRawAxis(2)*eSpeed);
-      System.out.println("Motor Set");
-    }else if(m_Xbox.getRawAxis(3) != 0){
-      elev.set(-1 * (m_Xbox.getRawAxis(3)*eSpeed));
+    //Elevator code
+    if(m_Xbox.getRawAxis(2) != 0.25){ //lTrigg
+      elev.set(eSpeed);
+      if(topElevSwitch.get()){
+        elev.stopMotor();
+        System.out.println();
+      }
+    }else if(m_Xbox.getRawAxis(3) != 0.25){//rTrigg
+      elev.set(-1 * (eSpeed));
     }
 
   }
@@ -211,31 +216,31 @@ public class Robot extends TimedRobot {
 
   ///////////////////Custom Methods///////////////////////////
 
-  public double GetSpeed(XboxController S_Xbox){
-    boolean aButton = S_Xbox.getAButton();
-    boolean bButton = S_Xbox.getBButton();
-    boolean yButton = S_Xbox.getYButton();
-    boolean xButton = S_Xbox.getXButton();
+  public double getSpeed(XboxController m_Xbox){
+    boolean aButton = m_Xbox.getAButton();
+    boolean bButton = m_Xbox.getBButton();
+    boolean yButton = m_Xbox.getYButton();
+    boolean xButton = m_Xbox.getXButton();
 
     //Controls speed
     if(aButton) {
-      Speed = 0.5;
+      speed = 0.5;
       System.out.println("A is pushed");
     }
     if(bButton) {
-      Speed = 0.75;
+      speed = 0.75;
       System.out.println("B is pushed");
     } 
     if(yButton) {
-      Speed = 1.0;
+      speed = 1.0;
       System.out.println("Y is pushed");
     }
     if(xButton){
-      Speed = 0.0;
+      speed = 0.0;
       System.out.println("X is pushed");
     }
 
-    return Speed;
+    return speed;
   }
   
 }

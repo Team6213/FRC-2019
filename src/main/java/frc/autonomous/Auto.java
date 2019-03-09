@@ -25,6 +25,7 @@ package frc.autonomous;
  */
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Auto {
@@ -42,9 +43,15 @@ public class Auto {
             
         }
     }
+
+    public void sandstorm(DifferentialDrive robotDrive, XboxController m_Xbox){
+        
+    }
+
     public double CalcTime(double distance) {
         double time = distance / SpeedRate;
         return time; 
 
     }
+
 }
