@@ -50,7 +50,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
  */
 public class Robot extends TimedRobot {
   //Variables
-  double speedMod;
+  double speedMod = 0.5;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -148,6 +148,7 @@ public class Robot extends TimedRobot {
     speedMod = getSpeedMod(m_Xbox);
     YAnalog = m_Xbox.getRawAxis(0);
 
+    System.out.println(speedMod);
     //Drive code
     robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod));
 
@@ -198,11 +199,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    double mult = -1.0;
     speedMod = getSpeedMod(m_Xbox);
     YAnalog = m_Xbox.getRawAxis(0);
 
     //Drive code
-    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod));
+    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod * 1.5));
+    // robotDrive.arcadeDrive(mult*(m_Xbox.getY() * m_Xbox.getY()), mult*(m_Xbox.getX() * m_Xbox.getX()));
+
 
     //Intake code
     if(m_Xbox.getBumper(Hand.kRight)){
@@ -251,27 +255,22 @@ public class Robot extends TimedRobot {
     boolean yButton = m_Xbox.getYButton();
     boolean xButton = m_Xbox.getXButton();
 
-    double speed = 1.0;
 
     //Controls speed
     if(aButton) {
-      speed = 0.25;
-      System.out.println("A is pushed");
+      return 0.25;
     }
     if(bButton) {
-      speed = 0.5;
-      System.out.println("B is pushed");
+      return 0.5;
     } 
     if(yButton) {
-      speed = 1.0;
-      System.out.println("Y is pushed");
+      return 1.0;
     }
     if(xButton){
-      speed = 0.0;
-      System.out.println("X is pushed");
+      return 0.0;
     }
 
-    return speed;
+  return speedMod;
   }
   
 }
