@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
   boolean rBumper;
   boolean lBumper;
   double YAnalog;
-  double XAnalog;
+  double XAnalog; 
   double eControl;
   boolean bSPressed;
   boolean tSPressed;
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
   private static final String kDefaultAuto = "Default";
   private static final String kSandstorm = "Sandstorm";
   private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final SendableChooser<String> auto_chooser = new SendableChooser<>();
   private final DigitalInput topElevSwitch = new DigitalInput(1);
   // private final DigitalInput bottomElevatorSwitch = new DigitalInput(0);
 
@@ -95,9 +95,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kSandstorm);
-    m_chooser.addOption("My Auto", kDefaultAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
+    auto_chooser.setDefaultOption("Default Auto", kSandstorm);
+    auto_chooser.addOption("My Auto", kDefaultAuto);
+    SmartDashboard.putData("Auto choices", auto_chooser);
 
     UsbCamera cam = CameraServer.getInstance().startAutomaticCapture();
   }
@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
   }
 
-  /**
+  /**m,
    * This function is called periodically during autonomous.
    */
   @Override
