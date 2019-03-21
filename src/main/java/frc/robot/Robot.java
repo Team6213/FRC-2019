@@ -50,7 +50,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
  */
 public class Robot extends TimedRobot {
   //Variables
-  double speedMod = 0.5;
+  double speedMod = 0.6;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -125,7 +125,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
+    m_autoSelected = auto_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
   }
@@ -135,46 +135,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    // switch (m_autoSelected) {
-    //   case kSandstorm:
-    //     teleopInit();
-    //     break;
-    //   case kDefaultAuto:
-    //   default:
-    //     // Put default auto code here
-    //     break;
-    // }
+    drive();
 
-    speedMod = getSpeedMod(m_Xbox);
-    YAnalog = m_Xbox.getRawAxis(0);
-
-    System.out.println(speedMod);
-    //Drive code
-    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod));
-
-    //Intake code
-    if(m_Xbox.getBumper(Hand.kRight)){
-      intake.arcadeDrive(0.5, 0.0); //Outtake
-    }else if(m_Xbox.getBumper(Hand.kLeft)){
-      intake.arcadeDrive(-0.5, 0.0); //Intake
-    }
-
-    if(m_Xbox.getRawAxis(1) != 0){
-      if(m_Xbox.getRawAxis(1) > 0.5){
-        hatchSol.set(DoubleSolenoid.Value.kForward);
-      }else if(m_Xbox.getRawAxis(1) < 0.5){
-        hatchSol.set(DoubleSolenoid.Value.kReverse);
-      }
-    }
-
-    //Elevator code
-    if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
-      elev.set(eSpeed);
-    }else if(m_Xbox.getRawAxis(3) != 0.0){//rTrigg
-      elev.set(-1 * (eSpeed));
-    }else{
-      elev.stopMotor();
-    }
+    
   }
 
   /**
@@ -199,38 +162,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    double mult = -1.0;
-    speedMod = getSpeedMod(m_Xbox);
-    YAnalog = m_Xbox.getRawAxis(0);
-
-    //Drive code
-    robotDrive.arcadeDrive(-1*(m_Xbox.getY() * speedMod), -1*(m_Xbox.getX() * speedMod * 1.5));
-    // robotDrive.arcadeDrive(mult*(m_Xbox.getY() * m_Xbox.getY()), mult*(m_Xbox.getX() * m_Xbox.getX()));
-
-
-    //Intake code
-    if(m_Xbox.getBumper(Hand.kRight)){
-      intake.arcadeDrive(0.5, 0.0); //Outtake
-    }else if(m_Xbox.getBumper(Hand.kLeft)){
-      intake.arcadeDrive(-0.5, 0.0); //Intake
-    }
-
-    if(m_Xbox.getRawAxis(1) != 0){
-      if(m_Xbox.getRawAxis(1) > 0.5){
-        hatchSol.set(DoubleSolenoid.Value.kForward);
-      }else if(m_Xbox.getRawAxis(1) < 0.5){
-        hatchSol.set(DoubleSolenoid.Value.kReverse);
-      }
-    }
-
-    //Elevator code
-    if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
-      elev.set(eSpeed);
-    }else if(m_Xbox.getRawAxis(3) != 0.0){//rTrigg
-      elev.set(-1 * (eSpeed));
-    }else{
-      elev.stopMotor();
-    }
+    drive();
 
   }
 
@@ -249,6 +181,42 @@ public class Robot extends TimedRobot {
 
   ///////////////////Custom Methods///////////////////////////
 
+  public void drive(){
+    double mult = -1.0;
+    speedMod = getSpeedMod(m_Xbox);
+    YAnalog = m_Xbox.getRawAxis(0);
+
+    //Drive code
+    robotDrive.arcadeDrive(-1*(m_Xbox.getRawAxis(1) * speedMod), (m_Xbox.getRawAxis(0) * speedMod * 1.2));
+    // robotDrive.arcadeDrive(mult*(m_Xbox.getY() * m_Xbox.getY()), mult*(m_Xbox.getX() * m_Xbox.getX()));
+
+
+    //Intake code
+    if(m_Xbox.getBumper(Hand.kRight)){
+      intake.arcadeDrive(0.75, 0.0); //Outtake
+    }else if(m_Xbox.getBumper(Hand.kLeft)){
+      intake.arcadeDrive(-0.75, 0.0); //Intake
+    }
+
+    if(m_Xbox.getY() != 0.0){
+      if(m_Xbox.getY() > 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kForward);
+      }else if(m_Xbox.getY() < 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kReverse);
+      }
+    }
+
+    //Elevator code
+    if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
+      elev.set(eSpeed);
+    }else if(m_Xbox.getRawAxis(3) != 0.0){//rTrigg
+      elev.set(-1 * (eSpeed));
+    }else{
+      elev.stopMotor();
+    }
+    
+  }
+
   public double getSpeedMod(XboxController m_Xbox){
     boolean aButton = m_Xbox.getAButton();
     boolean bButton = m_Xbox.getBButton();
@@ -258,13 +226,13 @@ public class Robot extends TimedRobot {
 
     //Controls speed
     if(aButton) {
-      return 0.25;
+      return 0.8;
     }
     if(bButton) {
-      return 0.5;
+      return 0.6;
     } 
     if(yButton) {
-      return 1.0;
+      return 0.7;
     }
     if(xButton){
       return 0.0;
