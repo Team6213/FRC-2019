@@ -198,14 +198,15 @@ public class Robot extends TimedRobot {
       intake.arcadeDrive(-0.75, 0.0); //Intake
     }
 
-
-    
-    if(m_Xbox.getY() > 0.5){
-      hatchSol.set(DoubleSolenoid.Value.kForward);
-    }else if(m_Xbox.getY() < 0.5){
-      hatchSol.set(DoubleSolenoid.Value.kReverse);
+    if(m_Xbox.getY() > 0.5 || m_Xbox.getY() < -0.5){
+      if(m_Xbox.getY() > 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kForward);
+      }else if(m_Xbox.getY() < 0.5){
+        hatchSol.set(DoubleSolenoid.Value.kReverse);
+      }
+    }else{
+      hatchSol.set(DoubleSolenoid.Value.kOff);
     }
-    
 
     //Elevator code
     if(m_Xbox.getRawAxis(2) != 0.0){ //lTrigg
