@@ -69,6 +69,10 @@ public class Robot extends TimedRobot {
   //Robot Objects
   private final DifferentialDrive robotDrive
       = new DifferentialDrive(new Spark(0), new Spark(1));
+
+  private final Spark mLeft = new Spark(0);
+  private final Spark mRight = new Spark(1);
+
   private final XboxController m_Xbox = new XboxController(0);
   private final VictorSP elev = new VictorSP(3);
 
@@ -187,15 +191,24 @@ public class Robot extends TimedRobot {
     YAnalog = m_Xbox.getRawAxis(0);
 
     //Drive code
-    robotDrive.arcadeDrive(-1*(m_Xbox.getRawAxis(1) * speedMod), (m_Xbox.getRawAxis(0) * speedMod * 1.2));
-    // robotDrive.arcadeDrive(mult*(m_Xbox.getY() * m_Xbox.getY()), mult*(m_Xbox.getX() * m_Xbox.getX()));
+    // robotDrive.arcadeDrive(-1*(m_Xbox.getRawAxis(1) * speedMod), (m_Xbox.getRawAxis(0) * speedMod * 1.2));
+    // // robotDrive.arcadeDrive(mult*(m_Xbox.getY() * m_Xbox.getY()), mult*(m_Xbox.getX() * m_Xbox.getX()));
+    if(m_Xbox.getRawAxis(1) != 0.0 && m_Xbox.getRawAxis(0) != 0.0){
+      mRight.set((m_Xbox.getRawAxis(1) * 2) * speedMod);
+      mLeft.set(m_Xbox.getRawAxis(1) * speedMod);
+
+      if(m_Xbox.getRawAxis(0) > 0){
+
+      }
+      
+    }
 
 
     //Intake code
     if(m_Xbox.getBumper(Hand.kRight)){
-      intake.arcadeDrive(0.75, 0.0); //Outtake
+      intake.arcadeDrive(0.7, 0.0); //Outtake
     }else if(m_Xbox.getBumper(Hand.kLeft)){
-      intake.arcadeDrive(-0.75, 0.0); //Intake
+      intake.arcadeDrive(-0.7, 0.0); //Intake
     }
 
     if(m_Xbox.getY() > 0.5 || m_Xbox.getY() < -0.5){
@@ -228,18 +241,13 @@ public class Robot extends TimedRobot {
 
     //Controls speed
     if(aButton) {
-      return 0.6;
+      return 0.8;
     }
     if(bButton) {
-      return 0.7;
+      return 0.9;
     } 
     if(yButton) {
-<<<<<<< HEAD
-      return 0.8;
-=======
-
-      return 0.7;
->>>>>>> master
+      return 1.0;
     }
     if(xButton){
       return 0.0;
