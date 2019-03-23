@@ -234,7 +234,12 @@ public class Robot extends TimedRobot {
       return 0.7;
     } 
     if(yButton) {
+<<<<<<< HEAD
       return 0.8;
+=======
+
+      return 0.7;
+>>>>>>> master
     }
     if(xButton){
       return 0.0;
