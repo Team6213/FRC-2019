@@ -50,7 +50,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
  */
 public class Robot extends TimedRobot {
   //Variables
-  double speedMod;
+  double speedMod = 0.6;
   double rTrigger;
   double lTrigger;
   boolean rBumper;
@@ -228,20 +228,24 @@ public class Robot extends TimedRobot {
 
     //Controls speed
     if(aButton) {
-      return 0.8;
+      return 0.6;
     }
     if(bButton) {
-      return 0.6;
+      return 0.7;
     } 
     if(yButton) {
+<<<<<<< HEAD
+      return 0.8;
+=======
 
       return 0.7;
+>>>>>>> master
     }
     if(xButton){
       return 0.0;
     }
 
-  return 0.6;
+  return speedMod;
 
   }
   
