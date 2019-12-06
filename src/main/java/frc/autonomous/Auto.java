@@ -27,6 +27,7 @@ package frc.autonomous;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+// blah blah coding
 
 public class Auto {
     final double SpeedRate = 2.0;
